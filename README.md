@@ -32,17 +32,17 @@ During the process, the application can collect the following data ( Note: afk=â
 
 PEAK USER DATA:
 
-name
-email
-over 18 signature
-sign-up_date
-last completed chapter
-last completed segment
-afk submitted
-afk submit date
-optional chapter tracking
-received Knowledge
-smart card number
+* name
+* email
+* over 18 signature
+* sign-up_date
+* last completed chapter
+* last completed segment
+* afk submitted
+* afk submit date
+* optional chapter tracking
+* received Knowledge
+* smart card number
 
 ï¿¼ 
 
