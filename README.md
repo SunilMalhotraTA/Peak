@@ -14,7 +14,7 @@ address)
 * PEAK is available to all App users
 * Confirmation of age etc. is only requested in the event that the user pursues the ‘Asking for Knowledge’ path at
 the end of the last chapter
-* The journey begins with a Welcome and / or initial message
+* The journey begins with a **Welcome** and / or initial message
 * Chapters must be viewed in sequence. All chapters can appear in the chapter list menu but greyed out if not yet
 watched
 * Chapters contain mandatory segments and may contain optional segments
