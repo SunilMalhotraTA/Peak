@@ -1,0 +1,477 @@
+# We should solve authorization issue
+# ISSUE1: Everyone can create/update/read workboors of users by email parameter
+# ISSUE2: Everyone can get chapter data without registration by API.
+# SOLVE_ISSUE1: use security token for any PEAK API call which will sign
+#               authorized user request
+# SOLVE_ISSUE2: use security token + restrict chapters calls for user with
+#               additional check about available chapters. To do this we should
+#               add user data inside chapters call and make this parameter required
+
+openapi: '3.0.0'
+info:
+  title: PEAK
+  description: >-
+    This is a PEAK server API description.  You can find out more about PEAK API at 
+    [https://api.timelesstoday.tv/Help/Index](https://api.timelesstoday.tv/Help/Index)
+  termsOfService: 'https://api.timelesstoday.tv/Help/Index'
+  contact:
+    #TODO: change contacts
+    email: aaa@aaa.aaa
+  license:
+    #TODO: Check licence for this site
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+  version: 1.0.0
+servers:
+ - url: api.timelesstoday.tv/api/v2/peak
+   description: Base part for api cals
+tags:
+  - name: global
+    description: Single operations
+  - name: workbook
+    description: Operations with workbook
+  - name: chapters
+    description: Operations with chapters
+paths:
+  /config:
+    get:
+      summary: Return global PEAK Configuration data
+      description: The peakConfig table provides the enrollment statement and 
+        welcome message as well as a message for the end of the final chapter.
+      operationId: getPEAKConfig
+      tags:
+        - global
+      responses:
+        '200':
+          description: "(OK)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/peakConfig'
+        '400':
+          $ref: "#/components/responses/400"
+        '404':
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/default"
+  /workbook:
+    post:
+      summary: Check workbook existense / Creates a workbook
+      description: Check workbook existense / Creates a workbook
+      operationId: createWorkbook
+      tags:
+        - workbook
+      parameters: 
+        - $ref: "#/components/parameters/email"
+        - $ref: "#/components/parameters/signupDate"
+        - $ref: "#/components/parameters/firstname"
+        - $ref: "#/components/parameters/lastname"
+        - $ref: "#/components/parameters/city"
+        - $ref: "#/components/parameters/state"
+        - $ref: "#/components/parameters/country"
+        - $ref: "#/components/parameters/phoneNumber"
+        - $ref: "#/components/parameters/agreementsSigned"
+        - $ref: "#/components/parameters/afkRequestDate"
+        - $ref: "#/components/parameters/smartCard"
+        - $ref: "#/components/parameters/pwk"
+      requestBody:
+        description: Request body examples
+        content:
+          'Check user email':
+            schema:
+              description: "Check user workbook existens"
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  example: "user@example.com"
+          'Create user workbook':
+            schema:
+              description: "Create user workbook"
+              type: object
+              required:
+                - email
+                - signupDate
+              properties:
+                email:
+                  type: string
+                  example: "user@example.com"
+                signupDate:
+                  type: string
+                  format: date
+                  example: "1970-01-01 00:00:01"
+      responses:
+        '200':
+          description: "Workbook data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/info"
+              example: {
+                code: "200",
+                body: {
+                  workbook: "Workbook ID",
+                  city: Melburn,
+                  country: Australian,
+                  phoneNumber: "+61 2 (6) 295-90-33",
+                  signupDate: "1970-01-01 00:00:01",
+                  firstname: Oliver
+                } 
+              }
+        '201':
+          description: "Workbook creation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/info"
+              example: {
+                code: "201",
+                message: "Successfully created"
+              }
+        '400':
+          $ref: "#/components/responses/400"
+        '404':
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/default"
+    put:
+      summary: Update user workbook data
+      description: Update user workbook data with given data
+      operationId: updateWorkbook
+      tags: 
+        - workbook
+      parameters: 
+        - $ref: "#/components/parameters/workbookId"
+        - $ref: "#/components/parameters/minor_email"
+        - $ref: "#/components/parameters/signupDate"
+        - $ref: "#/components/parameters/firstname"
+        - $ref: "#/components/parameters/lastname"
+        - $ref: "#/components/parameters/city"
+        - $ref: "#/components/parameters/state"
+        - $ref: "#/components/parameters/country"
+        - $ref: "#/components/parameters/phoneNumber"
+        - $ref: "#/components/parameters/agreementsSigned"
+        - $ref: "#/components/parameters/afkRequestDate"
+        - $ref: "#/components/parameters/smartCard"
+        - $ref: "#/components/parameters/pwk"
+      responses:
+        '204':
+          $ref: "#/components/responses/204"
+        '400':
+          $ref: "#/components/responses/400"
+        '404':
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/default"
+  '/workbook/segment':
+    post:
+      summary: Create workbook records for segmet
+      description: When a segment is completed this method create apropriate 
+        record for workbook
+      operationId: createWorkbookSegment
+      tags:
+        - workbook
+      parameters:
+        - name: workbookID
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: segmentID
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: journalResponse
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: recapResponse
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          $ref: "#/components/responses/201"
+        '400':
+          $ref: "#/components/responses/400"
+        '404':
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/default"
+  '/chapters':
+    get:
+      summary: Load chapters
+      description: Return all chapters data
+      operationId: getChapters
+      tags: 
+        - chapters
+      responses:
+        '200':
+          $ref: "#/components/responses/200"
+        '400':
+          $ref: "#/components/responses/400"
+        '404':
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/default"
+  '/chapters/{chapterId}':
+    get:
+      summary: Get segments for chapter
+      description: Return all segmets data for given chapter Id
+      operationId: getSegmentsForChapter
+      tags: 
+        - chapters
+      parameters: 
+        - name: chapterId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: "#/components/responses/200"
+        '400':
+          $ref: "#/components/responses/400"
+        '403':
+          $ref: "#/components/responses/403"
+        '404':
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/default"
+  '/chapters/{chapterId}/{segmentId}':
+    get:
+      summary: Get segment data
+      description: Return all segmet data for given chapter Id and segment Id
+      operationId: getSegmentForChapterById
+      tags: 
+        - chapters
+      parameters: 
+        - name: chapterId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: segmentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: "#/components/responses/200"
+        '400':
+          $ref: "#/components/responses/400"
+        '403':
+          $ref: "#/components/responses/403"
+        '404':
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/default"
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          minimum: 100
+          maximum: 600
+        message:
+          type: string
+    info:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          minimum: 100
+          maximum: 600
+          example: "200"
+        message:
+          type: string
+          example: "Information message"
+    peakConfig:
+      type: object
+      required:
+        - enrolstatement
+        - welcomemessage
+        - afkStatement
+      properties:
+        enrolstatement:
+          type: string
+        welcomemessage:
+          type: string
+        afkStatement:
+          type: string
+  parameters:
+    email:
+      name: email
+      in: query
+      required: true
+      schema:
+        type: string
+        example: "aaa@aaa.aaa"
+    minor_email:
+      name: email
+      in: query
+      required: false
+      schema:
+        type: string
+        example: "aaa@aaa.aaa"
+    workbookId:    
+      name: workbookId
+      in: query
+      required: true
+      schema:
+        type: string
+    signupDate:  
+      name: signupDate
+      in: query
+      required: false
+      schema:
+        type: string
+    firstname:
+      name: firstname
+      in: query
+      required: false
+      schema:
+        type: string
+    lastname:
+      name: lastname
+      in: query
+      required: false
+      schema:
+        type: string
+    city:
+      name: city
+      in: query
+      required: false
+      schema:
+        type: string
+    state:
+      name: state
+      in: query
+      required: false
+      schema:
+        type: string
+    country:
+      name: country
+      in: query
+      required: false
+      schema:
+        type: string
+    phoneNumber:
+      name: phoneNumber
+      in: query
+      required: false
+      schema:
+        type: string
+    agreementsSigned:
+      name: agreementsSigned
+      in: query
+      required: false
+      schema:
+        type: boolean
+    afkRequestDate:
+      name: afkRequestDate
+      in: query
+      required: false
+      schema:
+        type: string
+    smartCard:
+      name: smartCard
+      in: query
+      required: false
+      schema:
+        type: string
+    pwk:
+      name: pwk
+      in: query
+      required: false
+      schema:
+        type: string
+  responses:
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    "200":
+      description: "(OK)"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/info"
+    "201":
+      description: "(CREATED)"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/info"
+    "204":
+      description: "(UPDATED)"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/info"
+    "400":
+      description: "(BAD REQUEST)"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example: {
+            code: "404",
+            message: "Bad Request"
+          }
+    "403":
+      description: "(FORBIDDEN)"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example: {
+            code: "403",
+            message: "Forbidden"
+          }
+    "404":
+      description: "(NOT FOUND)"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example: {
+            code: "404",
+            message: "Not found"
+          }
+    "405":
+      description: "(NOT ALLOWED)"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example: {
+            code: "405",
+            message: "Method Not Allowed"
+          }
