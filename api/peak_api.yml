@@ -23,7 +23,7 @@ info:
     url: 'https://opensource.org/licenses/MIT'
   version: 1.0.0
 servers:
- - url: api.timelesstoday.tv/api/v2/peak
+ - url: "api.timelesstoday.tv/api/v2/peak"
    description: Base part for api cals
 tags:
   - name: global
@@ -75,7 +75,7 @@ paths:
         - $ref: "#/components/parameters/smartCard"
         - $ref: "#/components/parameters/pwk"
       requestBody:
-        description: Request body examples
+        description: application/json
         content:
           'Check user email':
             schema:
@@ -100,15 +100,15 @@ paths:
                   example: "user@example.com"
                 signupDate:
                   type: string
-                  format: date
-                  example: "1970-01-01 00:00:01"
+                  format: dateTime
+                  example: "1985-04-12T23:20:50.52Z"
       responses:
         '200':
           description: "Workbook data"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/info"
+                $ref: "#/components/schemas/body"
               example: {
                 code: "200",
                 body: {
@@ -116,20 +116,12 @@ paths:
                   city: Melburn,
                   country: Australian,
                   phoneNumber: "+61 2 (6) 295-90-33",
-                  signupDate: "1970-01-01 00:00:01",
+                  signupDate: "1985-04-12T23:20:50.52Z",
                   firstname: Oliver
                 } 
               }
         '201':
-          description: "Workbook creation"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/info"
-              example: {
-                code: "201",
-                message: "Successfully created"
-              }
+          $ref: "#/components/responses/201"
         '400':
           $ref: "#/components/responses/400"
         '404':
@@ -156,6 +148,42 @@ paths:
         - $ref: "#/components/parameters/afkRequestDate"
         - $ref: "#/components/parameters/smartCard"
         - $ref: "#/components/parameters/pwk"
+      requestBody:
+        content:
+          "Create segment record":
+            schema:
+              description: "Create segment record"
+              type: object
+              required:
+                - workbookID
+                - firstname
+                - lastname
+                - city
+                - afkRequestDate
+                - country
+                - pwk
+              properties:
+                workbookID:
+                  type: string
+                  example: "Workbook Id"
+                firstname:
+                  type: string
+                  example: "Oliver"
+                lastname:
+                  type: string
+                  example: "Smith"
+                city:
+                  type: string
+                  example: "Melburn"
+                afkRequestDate:
+                  type: dateTime
+                  example: "1985-04-12T23:20:50.52Z"
+                country:
+                  type: string
+                  example: "Australian"
+                pwk:
+                  type: boolean
+                  example: true
       responses:
         '204':
           $ref: "#/components/responses/204"
@@ -188,12 +216,12 @@ paths:
           in: query
           required: true
           schema:
-            type: string
+            type: dateTime
         - name: endDate
           in: query
           required: true
           schema:
-            type: string
+            type: dateTime
         - name: journalResponse
           in: query
           required: true
@@ -204,13 +232,43 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          "Create segment record":
+            schema:
+              description: "Create segment record"
+              type: object
+              required:
+                - workbookID
+                - segmentID
+                - startDate
+                - endDate
+                - journalResponse
+                - recapResponse
+              properties:
+                workbookID:
+                  type: string
+                  example: "WorkbookId"
+                segmentID:
+                  type: string
+                  example: "SegmentId"
+                startDate:
+                  type: dateTime
+                  example: "1985-04-12T23:20:50.52Z"
+                endDate:
+                  type: dateTime
+                  example: "1985-04-12T23:20:50.52Z"
+                journalResponse:
+                  type: string
+                  example: "Journal responce example"
+                recapResponse:
+                  type: string
+                  example: "Recap responce example"
       responses:
         '201':
           $ref: "#/components/responses/201"
         '400':
           $ref: "#/components/responses/400"
-        '404':
-          $ref: "#/components/responses/404"
         default:
           $ref: "#/components/responses/default"
   '/chapters':
@@ -222,7 +280,26 @@ paths:
         - chapters
       responses:
         '200':
-          $ref: "#/components/responses/200"
+          description: "Charpets data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/body"
+              example: {
+                code: "200",
+                body: {
+                  chapters: [{
+                    chapterId: "ChapterId ID",
+                    url: https://timelesstoday.tv
+                  },
+                  {
+                    chapterId: "ChapterId ID",
+                    url: https://timelesstoday.tv
+                  },
+                  ...
+                  ]
+                } 
+              }
         '400':
           $ref: "#/components/responses/400"
         '404':
@@ -244,7 +321,26 @@ paths:
             type: string
       responses:
         '200':
-          $ref: "#/components/responses/200"
+          description: "Charpet data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/body"
+              example: {
+                code: "200",
+                body: {
+                  segments: [{
+                    segmentId: "Segment ID",
+                    url: https://timelesstoday.tv
+                  },
+                  {
+                    segmentId: "Segment ID",
+                    url: https://timelesstoday.tv
+                  },
+                  ...
+                  ]
+                } 
+              }
         '400':
           $ref: "#/components/responses/400"
         '403':
@@ -273,7 +369,17 @@ paths:
             type: string
       responses:
         '200':
-          $ref: "#/components/responses/200"
+          description: "Segment data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/body"
+              example: {
+                code: "200",
+                body: {
+                  
+                } 
+              }
         '400':
           $ref: "#/components/responses/400"
         '403':
@@ -310,6 +416,20 @@ components:
         message:
           type: string
           example: "Information message"
+    body:
+      type: object
+      required:
+        - code
+        - body
+      properties:
+        code:
+          type: integer
+          minimum: 100
+          maximum: 600
+          example: "200"
+        body:
+          type: object
+          example: "{}"
     peakConfig:
       type: object
       required:
@@ -349,7 +469,7 @@ components:
       in: query
       required: false
       schema:
-        type: string
+        type: dateTime
     firstname:
       name: firstname
       in: query
@@ -397,7 +517,7 @@ components:
       in: query
       required: false
       schema:
-        type: string
+        type: dateTime
     smartCard:
       name: smartCard
       in: query
@@ -409,7 +529,7 @@ components:
       in: query
       required: false
       schema:
-        type: string
+        type: boolean
   responses:
     default:
       description: Unexpected error
@@ -423,18 +543,26 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/info"
-    "201":
+    '201':
       description: "(CREATED)"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/info"
+          example: {
+            code: "201",
+            message: "Successfully created"
+          }
     "204":
       description: "(UPDATED)"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/info"
+          example: {
+            code: "204",
+            message: "Successfully updated"
+          }
     "400":
       description: "(BAD REQUEST)"
       content:
@@ -442,7 +570,7 @@ components:
           schema:
             $ref: "#/components/schemas/Error"
           example: {
-            code: "404",
+            code: "400",
             message: "Bad Request"
           }
     "403":
