@@ -196,6 +196,39 @@ paths:
         default:
           $ref: "#/components/responses/default"
   '/workbook/segment':
+    get:
+      summary: Get user last complitted segment
+      description: Return last user completed segment stored in the database
+      tags:
+        - workbook
+      responses:
+        '200':
+          description: "(OK)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/main'
+              example: {
+                isSuccess: true,
+                status: "200",
+                msg: "",
+                result: {
+                  wkbk_segmentID: Number,
+                  workbookID: "WorkbookId",
+                  segmentID: Number,
+                  startDate: "1985-04-12T23:20:50.52Z",
+                  endDate: "1985-04-12T23:20:50.52Z",
+                  journalResponse: "Journal responce example",
+                  recapResponse: "Recap responce example",
+                  duration: "00:00:00"
+                }
+              }
+        '400':
+          $ref: "#/components/responses/400"
+        '404':
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/default"
     post:
       summary: Create workbook records for segmet
       description: When a segment is completed this method create apropriate 
@@ -267,10 +300,10 @@ paths:
                   example: "1985-04-12T23:20:50.52Z"
                 journalResponse:
                   type: string
-                  example: "Journal responce example"
+                  example: "Journal request example"
                 recapResponse:
                   type: string
-                  example: "Recap responce example"
+                  example: "Recap request example"
                 duration:
                   type: string
                   example: "00:00:00"
