@@ -108,18 +108,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/body"
+                $ref: "#/components/schemas/main"
               example: {
-                code: "200",
-                body: {
+                isSuccess: true,
+                status: "200",
+                msg: "Workbook data",
+                result: {
                   workbook: "Workbook ID",
                   city: Melburn,
                   country: Australian,
                   phoneNumber: "+61 2 (6) 295-90-33",
                   signupDate: "1985-04-12T23:20:50.52Z",
-                  firstname: Oliver
-                } 
-              }
+                  firstname: Oliver                  
+                }
+              }                 
         '201':
           $ref: "#/components/responses/201"
         '400':
@@ -232,6 +234,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: duration
+          in: query
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           "Create segment record":
@@ -264,6 +271,9 @@ paths:
                 recapResponse:
                   type: string
                   example: "Recap responce example"
+                duration:
+                  type: string
+                  example: "00:00:00"
       responses:
         '201':
           $ref: "#/components/responses/201"
@@ -284,10 +294,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/body"
+                $ref: "#/components/schemas/main"
               example: {
-                code: "200",
-                body: {
+                isSuccess: true,
+                status: "200",
+                msg: "All chapters data",
+                result: {
                   chapters: [{
                     chapterId: "ChapterId ID",
                     url: https://timelesstoday.tv
@@ -297,9 +309,9 @@ paths:
                     url: https://timelesstoday.tv
                   },
                   ...
-                  ]
-                } 
-              }
+                  ]              
+                }
+              }  
         '400':
           $ref: "#/components/responses/400"
         '404':
@@ -325,10 +337,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/body"
+                $ref: "#/components/schemas/main"
               example: {
-                code: "200",
-                body: {
+                isSuccess: true,
+                status: "200",
+                msg: "Charpet data",
+                result: {
                   segments: [{
                     segmentId: "Segment ID",
                     url: https://timelesstoday.tv
@@ -338,9 +352,9 @@ paths:
                     url: https://timelesstoday.tv
                   },
                   ...
-                  ]
-                } 
-              }
+                  ]             
+                }
+              } 
         '400':
           $ref: "#/components/responses/400"
         '403':
@@ -373,13 +387,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/body"
+                $ref: "#/components/schemas/main"
               example: {
-                code: "200",
-                body: {
-                  
-                } 
-              }
+                isSuccess: true,
+                status: "200",
+                msg: "Segment data",
+                result: {}
+              } 
         '400':
           $ref: "#/components/responses/400"
         '403':
@@ -390,59 +404,60 @@ paths:
           $ref: "#/components/responses/default"
 components:
   schemas:
-    Error:
+    main:
       type: object
       required:
-        - code
-        - message
+        - IsSuccess
+        - status
+        - msg
+        - result
       properties:
-        code:
+        isSuccess:
+          type: boolean
+          minimum: false
+          maximum: true
+        status:
           type: integer
           minimum: 100
           maximum: 600
-        message:
+        msg:
           type: string
-    info:
-      type: object
-      required:
-        - code
-        - message
-      properties:
-        code:
-          type: integer
-          minimum: 100
-          maximum: 600
-          example: "200"
-        message:
-          type: string
-          example: "Information message"
-    body:
-      type: object
-      required:
-        - code
-        - body
-      properties:
-        code:
-          type: integer
-          minimum: 100
-          maximum: 600
-          example: "200"
-        body:
+        result:
           type: object
-          example: "{}"
+          example: {}
+    Error:
+      allOf:
+        - $ref: '#/components/schemas/main'
     peakConfig:
-      type: object
-      required:
-        - enrolstatement
-        - welcomemessage
-        - afkStatement
-      properties:
-        enrolstatement:
-          type: string
-        welcomemessage:
-          type: string
-        afkStatement:
-          type: string
+      allOf:
+        - $ref: '#/components/schemas/main'
+        - type: object
+          required:
+            - result
+          properties:
+            result:
+              type: object
+              required:
+                - enrolstatement
+                - welcomemessage
+                - afkStatement
+              properties:
+                enrolstatement:
+                  type: string
+                welcomemessage:
+                  type: string
+                afkStatement:
+                  type: string
+      example: {
+        isSuccess: true,
+        status: "200",
+        msg: "Config data",
+        result: {
+          enrolstatement: "Default enrol statement",
+          welcomemessage: "Default welcome message",
+          afkStatement: "Default afkStatement"
+        }
+      }
   parameters:
     email:
       name: email
@@ -537,41 +552,69 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
+          example: {
+            isSuccess: false,
+            #TODO FIx status
+            status: "400",
+            msg: "Unexpected error",
+            result: {}
+          }
     "200":
       description: "(OK)"
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/info"
+            $ref: "#/components/schemas/main"
+          example: {
+            isSuccess: true,
+            status: "200",
+            msg: "Successfully",
+            result: {}
+          }
     '201':
       description: "(CREATED)"
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/info"
+            $ref: "#/components/schemas/main"
           example: {
-            code: "201",
-            message: "Successfully created"
+            isSuccess: true,
+            status: "201",
+            msg: "Successfully created",
+            result: {}
           }
     "204":
       description: "(UPDATED)"
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/info"
+            allOf:
+              - $ref: "#/components/schemas/main"
           example: {
-            code: "204",
-            message: "Successfully updated"
+            isSuccess: true,
+            status: "204",
+            msg: "Successfully updated",
+            result: {}
           }
     "400":
       description: "(BAD REQUEST)"
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error"
+            allOf:
+              - $ref: "#/components/schemas/Error"
+              - type: string
+                required:
+                  - msg
+                properties:
+                  msg:
+                    type: string
+                    example: "Bad Request"
           example: {
-            code: "400",
-            message: "Bad Request"
+            isSuccess: false,
+            status: "400",
+            msg: "Bad Request",
+            result: {}
           }
     "403":
       description: "(FORBIDDEN)"
@@ -580,9 +623,11 @@ components:
           schema:
             $ref: "#/components/schemas/Error"
           example: {
-            code: "403",
-            message: "Forbidden"
-          }
+            isSuccess: false,
+            status: "403",
+            msg: "Forbidden",
+            result: {}
+          }          
     "404":
       description: "(NOT FOUND)"
       content:
@@ -590,9 +635,11 @@ components:
           schema:
             $ref: "#/components/schemas/Error"
           example: {
-            code: "404",
-            message: "Not found"
-          }
+            isSuccess: false,
+            status: "404",
+            msg: "Not found",
+            result: {}
+          } 
     "405":
       description: "(NOT ALLOWED)"
       content:
@@ -600,6 +647,8 @@ components:
           schema:
             $ref: "#/components/schemas/Error"
           example: {
-            code: "405",
-            message: "Method Not Allowed"
-          }
+            isSuccess: false,
+            status: "405",
+            msg: "Method Not Allowed",
+            result: {}
+          } 
